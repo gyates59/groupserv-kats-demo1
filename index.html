@@ -1,0 +1,266 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your Botanical Match — Kats Botanicals</title>
+<style>
+  :root{
+    --green:#2F5D3A; --green-dark:#24492D; --forest:#1C2B1F; --ink:#26302A;
+    --cream:#F7F4EC; --card:#FFFFFF; --line:#E4DFD2; --gold:#C9A24B; --leaf:#4C8A5A;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{font-family:'Segoe UI',system-ui,-apple-system,sans-serif; background:var(--cream); color:var(--ink); min-height:100vh;}
+  .demo-banner{background:var(--gold); color:#3d2f0a; text-align:center; font-size:12.5px; font-weight:600; padding:7px 12px;}
+  header{background:var(--forest); padding:18px 20px; text-align:center;}
+  header .logo{color:#fff; font-weight:800; font-size:20px; letter-spacing:.1em; text-transform:uppercase;}
+  header .logo span{color:var(--gold);}
+  header .tag{color:#A9B5AA; font-size:12px; margin-top:3px; letter-spacing:.06em;}
+  .wrap{max-width:560px; margin:0 auto; padding:28px 18px 60px;}
+  .dots{display:flex; gap:8px; justify-content:center; margin-bottom:22px;}
+  .dot{width:34px; height:6px; border-radius:3px; background:var(--line); transition:background .25s;}
+  .dot.on{background:var(--green);}
+  .card{background:var(--card); border:1px solid var(--line); border-radius:16px; padding:28px 24px; box-shadow:0 4px 18px rgba(28,43,31,.07);}
+  h1{font-size:24px; line-height:1.25; margin-bottom:10px;}
+  h2{font-size:21px; line-height:1.3; margin-bottom:6px;}
+  .sub{color:#6C7268; font-size:15px; line-height:1.5; margin-bottom:20px;}
+  .opts{display:flex; flex-direction:column; gap:10px;}
+  button.opt{display:flex; align-items:center; gap:12px; width:100%; text-align:left; background:#fff; border:1.5px solid var(--line); border-radius:12px; padding:14px 16px; font-size:16px; font-weight:600; color:var(--ink); cursor:pointer; transition:border-color .15s, background .15s, transform .05s;}
+  button.opt:hover{border-color:var(--green); background:#F4F8F4;}
+  button.opt:active{transform:scale(.99);}
+  button.opt .emoji{font-size:22px; flex:0 0 auto;}
+  button.opt .hint{display:block; font-weight:400; font-size:13px; color:#8D9288; margin-top:2px;}
+  .primary{display:inline-block; width:100%; text-align:center; background:var(--green); color:#fff; border:none; border-radius:12px; padding:15px 18px; font-size:17px; font-weight:700; cursor:pointer;}
+  .primary:hover{background:var(--green-dark);}
+  .ghost{display:inline-block; width:100%; text-align:center; background:none; border:none; color:#8D9288; font-size:14px; margin-top:12px; cursor:pointer; text-decoration:underline;}
+  .vine{height:8px; border-radius:4px; background:linear-gradient(90deg,var(--leaf) 0 33%,var(--gold) 33% 66%,var(--green) 66% 100%); margin:18px 0 22px; opacity:.85;}
+  .match-card{border:2px solid var(--green); border-radius:14px; padding:22px 18px; background:#F4F8F4; margin-bottom:18px; text-align:center;}
+  .match-kicker{font-size:12px; font-weight:700; letter-spacing:.12em; color:var(--green); text-transform:uppercase; margin-bottom:6px;}
+  .match-name{font-size:28px; font-weight:800; margin-bottom:4px;}
+  .match-line{color:#6C7268; font-size:15px; margin-bottom:14px;}
+  .match-emoji{font-size:44px; display:block; margin-bottom:8px;}
+  ul.why{list-style:none; display:flex; flex-direction:column; gap:8px; margin-bottom:4px; text-align:left;}
+  ul.why li{padding-left:26px; position:relative; font-size:15px; line-height:1.45;}
+  ul.why li::before{content:"🌿"; position:absolute; left:0; top:0; font-size:15px;}
+  .offer{background:#fff; border:1.5px dashed var(--gold); border-radius:12px; padding:14px 16px; text-align:center; margin-bottom:18px;}
+  .offer b{color:var(--green-dark);}
+  .booked{background:#EDF7ED; border:1.5px solid var(--leaf); color:#255A25; border-radius:12px; padding:16px; font-size:15px; line-height:1.5; text-align:center; font-weight:600;}
+  .fine{font-size:11px; color:#9A9E95; line-height:1.5; margin-top:16px; text-align:center;}
+  .agegate{ text-align:center; }
+  .agegate .emoji-big{font-size:52px; display:block; margin-bottom:12px;}
+  .internal{margin-top:26px; border:1.5px dashed #A9B5AA; border-radius:12px; overflow:hidden;}
+  .internal-head{background:var(--forest); color:#fff; padding:11px 14px; font-size:13px; font-weight:700; cursor:pointer; display:flex; justify-content:space-between; align-items:center;}
+  .internal-head .pill{background:var(--gold); color:#3d2f0a; font-size:10.5px; font-weight:800; border-radius:99px; padding:2px 8px;}
+  .internal-body{display:none; padding:14px; background:#FBFAF6; font-size:13px;}
+  .internal.open .internal-body{display:block;}
+  table.payload{width:100%; border-collapse:collapse; margin:8px 0 12px;}
+  table.payload td{border-bottom:1px solid var(--line); padding:7px 6px; vertical-align:top;}
+  table.payload td:first-child{color:#8D9288; white-space:nowrap; width:44%;}
+  table.payload td:last-child{font-weight:600;}
+  .bandchip{display:inline-block; background:#EAF3EA; color:var(--green-dark); font-weight:800; font-size:11.5px; border-radius:99px; padding:2px 9px;}
+  .internal p{color:#6C7268; line-height:1.5; margin-bottom:8px;}
+  .hidden{display:none;}
+</style>
+</head>
+<body>
+<div class="demo-banner">DEMO — illustrative copy &amp; offer. Final version mirrors Kats Botanicals' live catalog, no-ship list &amp; discount rules.</div>
+<header>
+  <div class="logo">Kats <span>Botanicals</span></div>
+  <div class="tag">Lab-tested botanicals · 70,000+ customers</div>
+</header>
+
+<div class="wrap">
+  <div class="dots" id="dots"></div>
+
+  <!-- AGE GATE -->
+  <div class="card step agegate" id="step-intro">
+    <span class="emoji-big">🌿</span>
+    <h1>Find your botanical match</h1>
+    <p class="sub">Everyone's day asks something different of them. Answer 4 quick questions and we'll match you to the botanical lane that fits yours — plus a first-order treat at the end.</p>
+    <div class="vine"></div>
+    <button class="primary" onclick="go(1)">I'm 21 or older — let's go →</button>
+    <p class="fine">You must be 21+ to continue. Products shipped only where permitted by law.</p>
+  </div>
+
+  <!-- Q1: morning personality -->
+  <div class="card step hidden" id="step-1">
+    <h2>Pick your ideal morning:</h2>
+    <p class="sub">No wrong answers. This says more about you than you think.</p>
+    <div class="opts">
+      <button class="opt" onclick="answer('morning','Double espresso, straight at it',1)"><span class="emoji">☕</span><span>Double espresso, straight at it</span></button>
+      <button class="opt" onclick="answer('morning','Slow ramp, steady all day',1)"><span class="emoji">🌤️</span><span>Slow ramp, steady all day</span></button>
+      <button class="opt" onclick="answer('morning','Quiet, unhurried, tea in hand',1)"><span class="emoji">🍵</span><span>Quiet, unhurried, tea in hand</span></button>
+    </div>
+  </div>
+
+  <!-- Q2: goal (their site's exact effect categories) -->
+  <div class="card step hidden" id="step-2">
+    <h2>What's your day asking for more of?</h2>
+    <p class="sub">This picks your lane — energy, balance, or relaxation.</p>
+    <div class="opts">
+      <button class="opt" onclick="answer('goal','Energy & drive',2)"><span class="emoji">⚡</span><span>Energy &amp; drive<span class="hint">Get-up-and-go for full days</span></span></button>
+      <button class="opt" onclick="answer('goal','Balance & focus',2)"><span class="emoji">⚖️</span><span>Balance &amp; focus<span class="hint">Steady and clear, no rollercoaster</span></span></button>
+      <button class="opt" onclick="answer('goal','Relaxation & unwind',2)"><span class="emoji">🌅</span><span>Relaxation &amp; unwind<span class="hint">Smooth landings at the end of the day</span></span></button>
+    </div>
+  </div>
+
+  <!-- Q3: format -->
+  <div class="card step hidden" id="step-3">
+    <h2>How do you like your botanicals?</h2>
+    <p class="sub">Ritual, convenience, or flavor — all lab-tested, your call.</p>
+    <div class="opts">
+      <button class="opt" onclick="answer('format','The classic powder ritual',3)"><span class="emoji">🥄</span><span>The classic powder ritual<span class="hint">Measure it, mix it, make it yours</span></span></button>
+      <button class="opt" onclick="answer('format','Capsules — zero fuss',3)"><span class="emoji">💊</span><span>Capsules — zero fuss<span class="hint">Grab and go, no prep</span></span></button>
+      <button class="opt" onclick="answer('format','Gummies & shots — make it tasty',3)"><span class="emoji">🍬</span><span>Gummies &amp; shots — make it tasty<span class="hint">Flavor-first and portable</span></span></button>
+    </div>
+  </div>
+
+  <!-- Q4: experience -->
+  <div class="card step hidden" id="step-4">
+    <h2>Where are you on the botanical path?</h2>
+    <p class="sub">We'll match the strength and starting point to you.</p>
+    <div class="opts">
+      <button class="opt" onclick="answer('experience','Curious — new to all this',4)"><span class="emoji">🌱</span><span>Curious — new to all this</span></button>
+      <button class="opt" onclick="answer('experience','Some experience, still exploring',4)"><span class="emoji">🧭</span><span>Some experience, still exploring</span></button>
+      <button class="opt" onclick="answer('experience','Seasoned — I know my strains',4)"><span class="emoji">🌳</span><span>Seasoned — I know my strains<span class="hint">My Blend custom ratios might be your thing</span></span></button>
+    </div>
+  </div>
+
+  <!-- RESULT -->
+  <div class="card step hidden" id="step-result">
+    <div class="match-card">
+      <span class="match-emoji" id="r-emoji"></span>
+      <div class="match-kicker">Your botanical match</div>
+      <div class="match-name" id="r-name"></div>
+      <div class="match-line" id="r-line"></div>
+      <ul class="why" id="r-why"></ul>
+    </div>
+    <div class="offer">🎁 <b>Your match unlocks 10% off your first order</b><br><span style="font-size:13px; color:#6C7268;">In the live version: enter your email, the code + your personalized match guide arrive instantly.</span></div>
+    <div id="cta-zone">
+      <button class="primary" onclick="claim()">Email me my match + 10% code →</button>
+      <button class="ghost" onclick="restart()">Start over</button>
+    </div>
+    <div class="booked hidden" id="claimed-msg">
+      ✅ In the live version this captures the email (with consent language), tags the match profile, and drops them into the matched welcome sequence.<br>
+      <span style="font-weight:400;">First email arrives in seconds with the code + their match guide.</span>
+    </div>
+    <p class="fine">These statements have not been evaluated by the Food and Drug Administration. Products are not intended to diagnose, treat, cure, or prevent any disease. 21+ only. Shipped only where permitted by law.</p>
+
+    <!-- INTERNAL DEMO PANEL -->
+    <div class="internal" id="internal">
+      <div class="internal-head" onclick="document.getElementById('internal').classList.toggle('open')">
+        <span>👀 What your team sees when someone finishes</span><span class="pill">DEMO LAYER</span>
+      </div>
+      <div class="internal-body">
+        <p>Every completion is <b>zero-party data volunteered with a smile</b> — the visitor just built their own customer profile:</p>
+        <table class="payload" id="payload"></table>
+        <p><span class="bandchip" id="r-band">🌿 MATCHED LEAD</span>&nbsp; <span id="r-bandnote"></span></p>
+        <p style="margin-top:10px;"><b>Why this matters for a brand that can't buy ads:</b> the warmup email never has to mention a restricted product — it just asks <i>"What's your botanical match?"</i> The reader self-routes to the right shelf (kratom, kava, mushrooms), the email domain builds engagement history on clicks instead of complaints, and every match profile becomes a segment for the next send.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  const TOTAL = 4;
+  const answers = {};
+  const dotsEl = document.getElementById('dots');
+  for (let i = 0; i < TOTAL; i++) dotsEl.innerHTML += '<div class="dot" id="dot-'+i+'"></div>';
+
+  function show(id){
+    document.querySelectorAll('.step').forEach(s => s.classList.add('hidden'));
+    document.getElementById(id).classList.remove('hidden');
+    window.scrollTo({top:0, behavior:'smooth'});
+  }
+  function go(n){ show('step-'+n); mark(n-1); }
+  function mark(k){ for(let i=0;i<TOTAL;i++) document.getElementById('dot-'+i).classList.toggle('on', i<=k); }
+  function answer(key,val,step){
+    answers[key]=val;
+    if(step < TOTAL){ go(step+1); } else { result(); }
+  }
+
+  const MATCHES = {
+    'Energy & drive': {
+      emoji:'🌞', name:'The Sunny Dazer',
+      line:'Bright starts, full days, no dragging afternoons.',
+      lane:'Energy lane — white & green vein territory',
+      why:['Your lane on the shelf: the Energy collection (think White Maeng Da country)','Blends like Sunny Daze were literally named for people like you','Morning-forward serving rhythm — we’ll send the how-to with your guide']
+    },
+    'Balance & focus': {
+      emoji:'🌿', name:'The Steady Breeze',
+      line:'Even keel, clear head, nothing jittery.',
+      lane:'Balance lane — green vein territory',
+      why:['Your lane: the Balance collection (Green Maeng Da is the classic on-ramp)','Summer Breeze-style blends are built for steady, all-day even keel','Functional mushrooms pair naturally here — worth a look in your guide']
+    },
+    'Relaxation & unwind': {
+      emoji:'🌅', name:'The Sunset Chiller',
+      line:'Smooth landings, easy evenings, off-switch found.',
+      lane:'Relaxation lane — red vein & kava territory',
+      why:['Your lane: the Relaxation collection (Red Maeng Da country)','Sunset Chill was named for your exact evening','Kava — “smooth, steady, naturally grounding” — is your natural second shelf']
+    }
+  };
+  const FORMAT_LINE = {
+    'The classic powder ritual':'Powder it is — the full ritual, maximum control.',
+    'Capsules — zero fuss':'Capsules it is — zero prep, same lab-tested quality.',
+    'Gummies & shots — make it tasty':'Flavor-first — gummies and shots lead your guide.'
+  };
+  const EXP_NOTE = {
+    'Curious — new to all this':'Starter sizes first — small, easy, guided.',
+    'Some experience, still exploring':'Mid-size picks + a comparison guide to explore lanes.',
+    'Seasoned — I know my strains':'You should see My Blend — custom ratios, exclusive strains.'
+  };
+
+  function result(){
+    mark(TOTAL-1);
+    const m = MATCHES[answers.goal];
+    document.getElementById('r-emoji').textContent = m.emoji;
+    document.getElementById('r-name').textContent = m.name;
+    document.getElementById('r-line').textContent = m.line;
+    const why = document.getElementById('r-why');
+    why.innerHTML = '';
+    m.why.forEach(w => why.innerHTML += '<li>'+w+'</li>');
+    why.innerHTML += '<li>'+FORMAT_LINE[answers.format]+'</li>';
+    why.innerHTML += '<li>'+EXP_NOTE[answers.experience]+'</li>';
+
+    const pay = document.getElementById('payload');
+    pay.innerHTML = '';
+    const rows = {
+      'Age-gate passed': '21+ confirmed',
+      'Vibe (icebreaker Q)': answers.morning,
+      'Declared goal': answers.goal,
+      'Format preference': answers.format,
+      'Experience level': answers.experience,
+      'Match profile': m.name + ' · ' + m.lane,
+      'Next step taken': 'Email capture → 10% code + match guide'
+    };
+    for (const k in rows) pay.innerHTML += '<tr><td>'+k+'</td><td>'+rows[k]+'</td></tr>';
+
+    const band = document.getElementById('r-band');
+    const note = document.getElementById('r-bandnote');
+    if (answers.experience === 'Seasoned — I know my strains') {
+      band.textContent = '🌳 HIGH-VALUE — seasoned buyer';
+      note.textContent = 'Knows strains already → route to My Blend + bulk sequence, skip the 101 content.';
+    } else if (answers.experience === 'Curious — new to all this') {
+      band.textContent = '🌱 NURTURE — new to category';
+      note.textContent = 'Education-first welcome sequence; starter-size offers; patience pays here.';
+    } else {
+      band.textContent = '🧭 ACTIVE EXPLORER';
+      note.textContent = 'Comparison-shopping mode → lane-matched sequence with a reason to pick Kats now.';
+    }
+    show('step-result');
+  }
+  function claim(){
+    document.getElementById('cta-zone').classList.add('hidden');
+    document.getElementById('claimed-msg').classList.remove('hidden');
+  }
+  function restart(){
+    for (const k in answers) delete answers[k];
+    document.getElementById('cta-zone').classList.remove('hidden');
+    document.getElementById('claimed-msg').classList.add('hidden');
+    document.getElementById('internal').classList.remove('open');
+    mark(-1);
+    show('step-intro');
+  }
+</script>
+</body>
+</html>
